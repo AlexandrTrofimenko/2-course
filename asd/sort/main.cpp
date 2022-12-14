@@ -1,141 +1,72 @@
 #include <iostream>
-#include <vector>
-#include <cmath>
-int Digit(int x,int i,int d)
+using namespace std;
+const int n = 11, d = 10;
+int Digit(int x, int d)
 {
-	while (d > 1)
-	{
-		x /= 10;
-		d--;
-	}
-	return x%10;
+    while (d > 1)
+    {
+        x /= 10;
+        d--;
+    }
+    return x % 10;
 }
 
-void RadixSort(std::vector<int>& data, int k, int d)
+void radixSort(int dop_mas[n][n], int mas[n], int d)
 {
-	int dc = (k + d - 1) / d;
-	int m = pow(2, d);
-	int *C = new int [m];
-	int *B = new int[data.size()];
-	for (int i = 0; i < dc - 1; i++)
-	{
-		for (int j = 0; j < m - 1; j++)
-		{
-			C[j] = 0;
-		}
-		for (int j = 0; j < data.size()-1; j++)
-		{
-			int r = Digit(data[j], i);
-			C[r] = C[r] + 1;
-		}
-		for (int j = 1; j < m - 1; j++)
-		{
-			C[j] = C[j] + C[j - 1];
-		}
-		for (int j = data.size()-1; j>0; j--)
-		{
-			int r = Digit(data[j], i);
-			C[r] = C[r] - 1;
-			B[C[r]] = data[j];
-		}
-		for (int j = 0; j < data.size() - 1; j++) 
-		{
-			data[j] = B[j];
-		}
-	}
-	delete[] C;
-	delete[] B;
+    int mas_col[n] = {0}, i, j, temp = 0;
+    for (i = 0; i < n; i++)
+    {
+        int a = Digit(mas[i], d);
+        dop_mas[mas_col[a]][a] = mas[i];
+        mas_col[a]++;
+    }
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < mas_col[i]; j++)
+        {
+            mas[temp] = dop_mas[j][i];
+            temp++;
+        }
+    }
+}
+void help(int arr[], int n, int i)
+{
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+    if (l < n && arr[l] > arr[largest])
+        largest = l;
+    if (r < n && arr[r] > arr[largest])
+        largest = r;
+    if (largest != i)
+    {
+        swap(arr[i], arr[largest]);
+        help(arr, n, largest);
+    }
 }
 
-void combSort(std::vector<int>& data)
+void heap(int arr[], int n)
 {
-	double factor = 1.3; 
-	int step = data.size() - 1; 
-
-	while (step >= 1)
-	{
-		for (int i = 0; i + step < data.size(); i++)
-		{
-			if (data[i] > data[i + step])
-			{
-				std::swap(data[i], data[i + step]);
-			}
-		}
-		step /= factor;
-	}
-}
-
-void insertSort(std::vector<int>& data) {
-	int tmp;
-	int j;
-	for (int i = 0; i < data.size(); i++) {
-		tmp = data[i];
-		for (j = i - 1; j >= 0 && data[j] > tmp; j--) 
-		{
-			data[j + 1] = data[j];
-		}
-		data[j + 1] = tmp;
-
-	}
-}
-void selectionSort(std::vector<int>& data)
-{
-	int j = 0;
-	for (int i = 0; i < data.size() - 1; i++)
-	{
-		int min = i;
-		for (j = i + 1; j < data.size(); j++)
-		{
-			if (data[j] < data[min])
-			{
-				min = j;
-			}
-		}
-		if (min != i)
-		{
-			std::swap(data[i], data[min]);
-
-		}
-	}
-}
-void shelSort(std::vector<int>& data)
-{
-	int i, j, step;
-	int tmp;
-	for (step = data.size() / 2; step > 0; step /= 2)
-	{
-		for (i = step; i < data.size(); i++)
-		{
-			tmp = data[i];
-			for (j = i; j >= step; j -= step)
-			{
-				if (tmp < data[j - step])
-					data[j] = data[j - step];
-				else
-					break;
-			}
-			data[j] = tmp;
-		}
-	}
+    for (int i = n / 2 - 1; i >= 0; i--)
+        help(arr, n, i);
+    for (int i = n - 1; i >= 0; i--)
+    {
+        swap(arr[0], arr[i]);
+        help(arr, i, 0);
+    }
 }
 
 int main()
 {
-	srand(time(NULL));
-	std::vector <int> mass;
-	int n; std::cin >> n;
-	std::cout << "Range of mass" << std::endl;
-	for (int i = 0; i < n; i++)
-	{
-		mass.push_back(rand());
-	}
-	for (int i = 0; i < n; i++)
-		std::cout << mass[i] << " ";
-	RadixSort(mass,4,10);
-	std::cout << std::endl << "after sort" << std::endl;
-	
-	for (int i = 0; i < n; i++)
-		std::cout << mass[i] << " ";
-
-	return 0;
+    int mas[n] = { 67654, 5433567, 12609977, 935599876, 142334567, 61300987, 7328853, 126456789, 847766, 6888655 ,388766 };
+    int dop_mas[n][n];
+    for (int i = 1; i < d + 1 ; i++)
+        radixSort(dop_mas, mas, i);
+    for (int i = 0; i < n; i++)
+        cout << mas[i] << " ";
+  /*  heap(mas, n);
+    for (int i = 0; i < n; ++i)
+        cout << mas[i] << " ";*/
+    return 0;
 }
