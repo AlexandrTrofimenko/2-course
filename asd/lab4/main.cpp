@@ -1,116 +1,236 @@
 #include <iostream>
+#include <fstream>
+#include <iostream>
+#include <string>
 
-using namespace std;
 
-struct node {
-    explicit node(int t) : data(t) {}
-    int data;
-    node* first = nullptr;
-    node* second = nullptr;
-};
+void main()
+{
+    const int s = 4;
+    std::string mass[s];
+    int ss = 0;
+    int k, chet;
+    chet = 0;
+    char N;
+    std::ifstream fin("mas.txt");
+    std::ofstream aa("A.txt");
+    std::ofstream bb("B.txt");
+    std::string t;
 
-void Tree(node* tree) {
-    if (tree != nullptr) {
-        Tree(tree->first);
-        cout << tree->data << " ";
-        Tree(tree->second);
+    if (fin.is_open())
+    {
+        while (!fin.eof())
+        {
+            if (ss < 4)
+            {
+                k = 0;
+                while (k < s)
+                {
+                    fin >> N;
+                    if (N != ' ')
+                        t += N;
+                    else
+                    {
+                        mass[k] = t;
+                        k++;
+                        t.clear();
+                    }
+                }
+                for (int i = 0; i < s; i++)
+                {
+                    for (int j = i + 1; j < s; j++)
+                    {
+                        if (mass[i] > mass[j])
+                        {
+                            std::string tmp;
+                            tmp = mass[i];
+                            mass[i] = mass[j];
+                            mass[j] = tmp;
+                        }
+                    }
+                }
+                if (chet % 2 == 0) {
+                    for (int i = 0; i < s; i++)
+                    {
+                        aa << mass[i];
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < s; i++)
+                    {
+                        bb << mass[i];
+                    }
+                }
+                chet++;
+                ss++;;
+            }
+            else break;
+        }
     }
-}
+    else 
+    {
+       std::cout << "Ошибка";
+    }
+    fin.close();
+    aa.close();
+    bb.close();
 
-node* new_leaf(node* tree, int x) {
-    if (tree == nullptr)
-        tree = new node(x);
-    else
-        if (x < tree->data)
-            tree->first = new_leaf(tree->first, x);
+
+    k = 0;
+    std::ofstream cc("C.txt");
+    std::ofstream dd("D.txt");
+
+
+    std::ifstream AA("A.txt");
+    std::ifstream BB("B.txt");
+
+
+    char mas[s];
+    char ms[s];
+    int dddd = 0;
+    // int rrrr = 0;
+
+    while (!AA.eof() && !BB.eof()) {
+        if (dddd < 2) {
+            k = 0;
+            while (k < s)
+            {
+                AA >> N;
+                mas[k++] = N;
+            }
+            k = 0;
+            while (k < s)
+            {
+                BB >> N;
+                ms[k++] = N;
+            }
+
+            int aaa, bbb;
+            aaa = 0;
+            bbb = 0;
+
+            int ggg = 0;
+
+            if (dddd % 4 == 0 || dddd % 4 == 2) {
+                while (ggg < 2 * s) {
+
+                    if (aaa < s && bbb < s) {
+                        if (mas[aaa] > ms[bbb]) {
+                            cc << ms[bbb];
+                            bbb++;
+                        }
+                        else {
+                            cc << mas[aaa];
+                            aaa++;
+                        }
+                    }
+                    else {
+                        if (aaa < s) {
+                            cc << mas[aaa];
+                            aaa++;
+                        }
+                        else if (bbb < s) {
+                            cc << ms[bbb];
+                            bbb++;
+                        }
+                    }
+                    ggg++;
+                }
+            }
+            else if (dddd % 4 == 1 || dddd % 4 == 3) {
+                while (ggg < 2 * s) {
+
+                    if (aaa < s && bbb < s) {
+                        if (mas[aaa] > ms[bbb]) {
+                            dd << ms[bbb];
+                            bbb++;
+                        }
+                        else {
+                            dd << mas[aaa];
+                            aaa++;
+                        }
+                    }
+                    else {
+                        if (aaa < s) {
+                            dd << mas[aaa];
+                            aaa++;
+                        }
+                        else if (bbb < s) {
+                            dd << ms[bbb];
+                            bbb++;
+                        }
+                    }
+                    ggg++;
+                }
+            }
+            dddd++;
+        }
         else
-            tree->second = new_leaf(tree->second, x);
-    return(tree);
-}
-
-void empty_space(node* tree) {
-    if (tree != nullptr) {
-        empty_space(tree->first);
-        empty_space(tree->second);
-        delete tree;
+            break;
     }
-}
 
-node* Search(node* tree, int x)
-{
-    if (tree == nullptr) return nullptr;
-    if (tree->data == x) return tree;
-    if (x < tree->data) return Search(tree->first, x);
-    else return Search(tree->second, x);
 
-}
+    cc.close();
+    dd.close();
+    int eee = 0;
 
-node* min(node* x)
-{
-    if (x->first == nullptr) return x;
-    else return min(x->first);
-}
+    std::ifstream CC("C.txt");
+    std::ifstream DD("D.txt");
 
-node* max(node* x)
-{
-    if (x->second == nullptr) return x;
-    else return max(x->second);
-}
+    std::ofstream exx("Exit.txt");
 
-node* delete_leaf(node* tree, int x)
-{
-    if (tree == nullptr)
-        return tree;
-    if (x < tree->data)
-        tree->first = delete_leaf(tree->first, x);
-    else if (x > tree->data)
-        tree->second = delete_leaf(tree->second, x);
-    else if (tree->first != nullptr && tree->second != nullptr) {
-        tree->data = min(tree->second)->data;
-        tree->second = delete_leaf(tree->second, tree->data);
-    }
-    else
-        if (tree->first != nullptr)
-            tree = tree->first;
-        else if (tree->second != nullptr)
-            tree = tree->second;
+    char masi[2 * s];
+    char ma[2 * s];
+    while (!DD.eof() && !CC.eof()) {
+        if (eee < 1) {
+            k = 0;
+            while (k < 2 * s)
+            {
+                CC >> N;
+                masi[k++] = N;
+            }
+            k = 0;
+            while (k < 2 * s)
+            {
+                DD >> N;
+                ma[k++] = N;
+            }
+            int aaa, bbb;
+            aaa = 0;
+            bbb = 0;
+            int ggg = 0;
+            while (ggg < 4 * s) {
+
+                if (aaa < 2 * s && bbb < 2 * s) {
+                    if (masi[aaa] > ma[bbb]) {
+                        exx << ma[bbb]<<" ";
+                        bbb++;
+                    }
+                    else {
+                        exx << masi[aaa]<<" ";
+                        aaa++;
+                    }
+                }
+                else {
+                    if (aaa < 2 * s) {
+                        exx << masi[aaa]<<" ";
+                        aaa++;
+                    }
+                    else if (bbb < 2 * s) {
+                        exx << ma[bbb]<<" ";
+                        bbb++;
+                    }
+                }
+                ggg++;
+            }
+        }
         else
-            tree = nullptr;
-    return tree;
-}
-
-int main() {
-
-    setlocale(LC_ALL, "Rus");
-
-    node* root = nullptr;
-    cout << "Введите число вершин:" << endl;
-    int n, a, find, dob, del;
-    cin >> n;
-    cout << "Введите вершины дерева:" << endl;
-    for (int i = 0; i < n; i++) {
-        cin >> a;
-        root = new_leaf(root, a);
+            break;
+        eee++;
     }
-    Tree(root);
-    cout << endl;
-    cout << "Введите вершину, которую нужно удалить ";
-    cin >> del;
-    delete_leaf(root, del)->data;
-    Tree(root);
-    cout << endl;
-    cout << "Введите вершину, которую нужно добавить ";
-    cin >> dob;
-    new_leaf(root, dob)->data;
-    Tree(root);
-    cout << endl;
-    cout << "Введите вершину, которую нужно найти ";
-    cin >> find;
-    if (Search(root, find) != nullptr)
-        cout << "Присутствует";
-    else
-        cout << "Отсутствует";
-    //cout << Search(root, find)->data<< endl;
-    empty_space(root);
-    return 0;
+    AA.close();
+    BB.close();
+    CC.close();
+    DD.close();
 }

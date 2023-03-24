@@ -13,7 +13,7 @@ class Hashtable
 		{
 			sum += int(str[i]);
 		}
-		return (11*sum % 27)*N/27;
+		return sum % N;
 	}
 public:
 	
@@ -134,7 +134,7 @@ int main()
 	Hashtable table;
 	table.AddinTable();
 	table.PrintTable();
-	table.Find("Sergey");
+	table.Find("Polina");
 	table.DeleteStr("Sasha");
 	table.PrintTable();
 	table.Find("Sasha");
