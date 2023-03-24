@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QtDebug>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,11 +16,14 @@ public:
     ~MainWindow();
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void resizeEvent(QResizeEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void line();
 private:
     Ui::MainWindow *ui;
-    QVector <QPointF> dote;
-    int r=20;
-    int _width,_height;
+    QVector <QPoint> dote;
+    QVector <int> rast;
+    bool fl = false;
+    QPoint shot;
+    int r = 50;
 };
 #endif // MAINWINDOW_H
