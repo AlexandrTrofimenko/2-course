@@ -11,14 +11,14 @@ struct Point
 
 Point p0;
 
-int orient(Point p1, Point p2, Point p3) {
+int orient(Point& p1, Point& p2, Point& p3) {
 	int t = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
 	if (t == 0)
 		return 0;
 	return (t > 0) ? 1 : 2;
 }
 
-int distance(Point p1, Point p2) {
+int distance(Point& p1, Point& p2) {
 	return (p2.x - p1.x) * (p2.y - p1.y);
 }
 
