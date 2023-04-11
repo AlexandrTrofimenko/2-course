@@ -18,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 points.append(QPoint(i+size,j+size));
             }
-
         }
     }
     ui->setupUi(this);

@@ -14,16 +14,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void paintEvent(QPaintEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void kasatelnie();
+
 private:
     Ui::MainWindow *ui;
-    QVector <QPoint> dote;
-    QLine line;
-    QPoint shot;
-    int r = 50;
-    double k,b,d;
 };
 #endif // MAINWINDOW_H

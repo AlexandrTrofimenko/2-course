@@ -29,7 +29,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
             painter.drawEllipse(i,r,r);
         }
     painter.drawEllipse(shot,5,5);
-}
+
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
@@ -45,9 +45,29 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-   if(event->key()==Qt::Key_Enter) {
 
+   if(event->key()==Qt::Key_Enter) {
+        qDebug("pressed");
+        for(int i = 0; i < dote.size();i++) {
+            k = (dote[i].y() - shot.y()) / (dote[i].x() - shot.x());
+            b = ((dote[i].x() - shot.y()) * (shot.x() - dote[i].y())) / (dote[i].x() - shot.x());
+        }
    }
+
+}
+
+void MainWindow::kasatelnie()
+{
+    double X,Y;
+    d = qSqrt(qPow(dote[i].x() - shot.x(),2) + qPow(dote[i].y() - shot.x(),2));
+    double a = ((r*r) - (d/2*d/2)  +  d*d )/(2*d);
+    double h = qSqrt(r*r-a*a);
+    for(int i = 0; i < dote.size(); i++) {
+        X = shot.x()+a*(dote[i].x() - shot.x())/d;
+        Y = shot.y()+a*(dote[i].y() - shot.y())/d;
+
+    }
+
 }
 
 

@@ -8,7 +8,6 @@ struct Point
 {
 	int x, y;
 };
-
 Point p0;
 
 int orient(Point& p1, Point& p2, Point& p3) {
@@ -29,12 +28,19 @@ bool cmp(Point& p1, Point& p2) {
 	return (orient(p0, p1, p2) == 2);
 }
 
+Point NextToTop(stack<Point> S) {
+	if (S.size() < 2)
+		exit(1);
+	S.pop();
+	return S.top();
+}
+
 void convexHull(Point* points,int n) {
 	
 	int min  = 0;
 	int ymin = points[0].y;
 	for (int i = 1; i < n; i++) {
-		if ((points[i].y < points[0].y) || (points[0].y == points[i].y && points[i].x < points[min].x)) {
+		if ((points[i].y < points[0].y) && (points[0].y == points[i].y && points[i].x < points[min].x)) {
 			min = i; ymin = points[i].y;
 		}
 	}
@@ -56,13 +62,14 @@ void convexHull(Point* points,int n) {
 	S.push(points[0]);
 	S.push(points[1]);
 	S.push(points[2]);
+
 	for (int i = 3; i < n; i++) {
-		while (orient(S.top(), points[1], points[2]) != 2) {
+		while (orient(NextToTop(S), S.top(), points[i]) != 2) {
 			S.pop();
 		}
 		S.push(points[i]);
 	}
-	cout << "Result of algorithm Graham:" << endl;
+	cout << "Result :" << endl;
 	while (!S.empty()) {
 		Point p = S.top();
 		cout << "(" << p.x << "," << p.y << ")" << endl;
@@ -70,13 +77,15 @@ void convexHull(Point* points,int n) {
 	}
 }
 
+
 int main()
 {
-	Point points[] = { 
+	Point points[] = {
 	{ 0, 3 }, { 1, 1 }, { 2, 2 }, { 4, 4 },
-	{ 0, 0 }, { 1, 2 }, { 3, 1 }, { 3, 3 } 
-	};
-	int n = sizeof(points) / sizeof(points[0]);
+	{ 0, 0 }, { 1, 2 }, { 3, 1 }, { 3, 3 },
+	{ -4 , -4 },{ -4 , 4 }, { 4, -4 } };
+	int n = sizeof(points)  / sizeof(points[0]);
 	convexHull(points, n);
+
 	return 0;
 }
