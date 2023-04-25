@@ -39,14 +39,22 @@ void convexHull(Point* points,int n) {
 	
 	int min  = 0;
 	int ymin = points[0].y;
-	for (int i = 1; i < n; i++) {
-		if ((points[i].y < points[0].y) && (points[0].y == points[i].y && points[i].x < points[min].x)) {
-			min = i; ymin = points[i].y;
+	for (int i = 0; i < n; i++)
+	{
+		if (points[i].y < points[0].y)
+			swap(points[i], points[0]);
+		else if (points[i].y == points[0].y)
+		{
+			if (points[i].x < points[0].x)
+				swap(points[i], points[0]);
+			else
+				continue;
 		}
 	}
 	swap(points[0], points[min]);
 	p0 = points[0];
-	sort(points + 1, points + n, cmp);
+	int j = 0;
+	sort(points+1,points + n, cmp);
 	
 	int m = 1;
 	for (int i = 1; i < n; i++) {
@@ -64,7 +72,7 @@ void convexHull(Point* points,int n) {
 	S.push(points[2]);
 
 	for (int i = 3; i < n; i++) {
-		while (orient(NextToTop(S), S.top(), points[i]) != 2) {
+		while (orient(NextToTop(S), S.top(), points[i]) != 2 ) {
 			S.pop();
 		}
 		S.push(points[i]);
@@ -81,9 +89,9 @@ void convexHull(Point* points,int n) {
 int main()
 {
 	Point points[] = {
-	{ 0, 3 }, { 1, 1 }, { 2, 2 }, { 4, 4 },
+	{ 0, 3 }, { 1, 1 }, { 2, 2 }, { 5, 5 },
 	{ 0, 0 }, { 1, 2 }, { 3, 1 }, { 3, 3 },
-	{ -4 , -4 },{ -4 , 4 }, { 4, -4 } };
+	{ -5 , -5 },{ -5 , 5 }, { 5, -5 }, {0,9}, {-9,0}, {0,-9}, {9,0} };
 	int n = sizeof(points)  / sizeof(points[0]);
 	convexHull(points, n);
 
