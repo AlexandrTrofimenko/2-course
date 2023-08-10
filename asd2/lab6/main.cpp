@@ -1,35 +1,69 @@
 #include <iostream>
-#include <string>
 #include <vector>
 #include <fstream>
 
 using namespace std;
 struct Edge {
 	int left, right, weight;
-	Edge(int m_left, int m_right, int m_weight)
-	{
+	Edge(int m_left, int m_right, int m_weight) {
 		left = m_left;
 		right = m_right;
 		weight = m_weight;
 	}
 };
+vector<int>* v;
+vector<Edge> edge;
+int num = 0;
+int* mass;
 
-int Num = 0;//число вершин
-bool* visit;
-vector<int>* v;//списки смежности
-vector<Edge> g;//вектор <левая, правая, вес>
-int* parent;//массив множеств
+void read() {
 
-void Quick_Sort(int low, int high, vector<Edge>& x)
-{
-	if (low >= high)
-	{
-		return;
+	ifstream in("input.txt");
+	int elem;
+	if (!in) {
+		cout << "Smth wrong with file";
+		exit(1);
 	}
-	int m = (low + high) / 2 + 1;
+	else {
+		while (in >> elem) {
+			num++;
+		}
+	}
+	in.close();
+	num = sqrt(num);
+	v = new vector<int>[num];
+	in.open("input.txt");
+	for (int i = 0; i < num; i++) {
+		for (int j = 0; j < num; j++) {
+			in >> elem;
+			if (elem != 0) {
+				v[i].push_back(j);
+				edge.push_back(Edge(i, j, elem));
+			}
+		}
+	}
+	in.close();
+	cout << endl << "Вершины смежные с ней" << endl;
+	for (int i = 0; i < num; i++) {
+		cout << i << ":";
+		for (int j = 0; j < v[i].size(); j++) {
+			cout << v[i][j] << " ";
+		}
+		cout << endl;
+	}
+
+	for (int i = 0; i < edge.size(); i++) {
+		cout << "<" << edge[i].left << ", " << edge[i].right << ";" << edge[i].weight << ">" << endl;
+	}
+}
+
+void Quick_sort(int left, int right, vector<Edge>& x) {
+	if (left >= right)
+		return;
+	int m = (left + right) / 2 + 1;
 	int k = x[m].weight;
-	int l = low - 1;
-	int r = high + 1;
+	int l = left - 1;
+	int r = right + 1;
 	while (1)
 	{
 		do
@@ -48,100 +82,53 @@ void Quick_Sort(int low, int high, vector<Edge>& x)
 	}
 	r = l;
 	l--;
-	Quick_Sort(low, l, x);
-	Quick_Sort(r, high, x);
+	Quick_sort(left, l, x);
+	Quick_sort(r, right, x);
 }
-void Read()
-{
-	//считаем файл и считаем сколько вершин
-	int element;
-	ifstream in("input.txt");
-	if (!in)
-		exit(1);
-	else
-		while (in >> element)
-			Num++;
-	in.close();
-	Num = sqrt(Num);
 
-	//считываем файл и запоминаем смежные вершины
-	v = new vector<int>[Num];
-	in.open("input.txt");
-	if (!in)
-		exit(1);
-	for (int i = 0; i < Num; i++)
-		for (int j = 0; j < Num; j++)
-		{
-			in >> element;
-			if (element != 0)
-			{
-				v[i].push_back(j);
-				g.push_back(Edge(i, j, element));
-			}
-		}
-	in.close();
+void Union(int u, int v) {
+	mass[u] = mass[v];
+}
 
-	cout << "\nВершина: смежные с ней \n";
-	for (int i = 0; i < Num; i++)
-	{
-		cout << i << ": ";
-		for (int j = 0; j < v[i].size(); j++)
-			cout << v[i][j] << " ";
-		cout << endl;
+int Find_Set(int item) {
+	if (item == mass[item]) {
+		return item;
 	}
-
-	cout << "\n <Левая вершина, правая вершина : длина ребра> \n";
-	for (int i = 0; i < g.size(); i++)
-		cout << "<" << g[i].left << ", " << g[i].right << " : " << g[i].weight << ">" << endl;
+	else {
+		return Find_Set(mass[item]);
+	}
 }
-
-//поиск множества данной вершины
-int Find_Set(int i)
-{
-	if (parent[i] == i)
-		return i;
-	else
-		return Find_Set(parent[i]);
+void Make_Set(int i) {
+	mass[i] = i;
 }
+void MST_Kruskal() {
+	mass = new int[num];
+	vector<Edge> mst;
+	for (int i = 0; i < num; i++)
+		Make_Set(i);
 
-//объединение множества (мн-во вершины u теперь будет равно мн-ву вершины v)
-void Union(int u, int v)
-{
-	parent[u] = parent[v];
-}
-
-void MST_Kruskal()
-{
-	parent = new int[Num];
-	vector<Edge> MST; //место хранения нашего минимально остовного дерева
-	for (int i = 0; i < Num; i++)
-		parent[i] = i;
-	//отсортировали по весу ребра (по возрастанию)
-	Quick_Sort(0, g.size() - 1, g);
-
-	//проверяем, если две смежные вершины не в одном мн-ве, то добавляем + обновление мн-ва
-	for (int i = 0; i < g.size(); i++)
-		if (Find_Set(g[i].left) != Find_Set(g[i].right))
-		{
-			MST.push_back(g[i]);
-			Union(Find_Set(g[i].left), Find_Set(g[i].right));
+	Quick_sort(0, edge.size() - 1, edge);
+	for (int i = 0; i < edge.size() - 1; i++) {
+		if (Find_Set(edge[i].left) != Find_Set(edge[i].right)) {
+			mst.push_back(edge[i]);
+			Union(Find_Set(edge[i].left),Find_Set(edge[i].right));
 		}
-
-	ofstream out; out.open("output.txt");
+	}
+	ofstream out("output.txt");
 	cout << "\n Минимальное остовное дерево: \n";
 	out << "\n Пара вершин : вес ребра \n";
 	cout << "\n Пара вершин : вес ребра \n";
-	for (int i = 0; i < MST.size(); i++)
+	for (int i = 0; i < mst.size(); i++)
 	{
-		out << i + 1 << ". " << MST[i].left << " - " << MST[i].right << " : " << MST[i].weight << "\n";
-		cout << i + 1 << ". " << MST[i].left << " - " << MST[i].right << " : " << MST[i].weight << "\n";
+		out << i + 1 << ". " << mst[i].left << " - " << mst[i].right << " : " << mst[i].weight << "\n";
+		cout << i + 1 << ". " << mst[i].left << " - " << mst[i].right << " : " << mst[i].weight << "\n";
 	}
 }
 
 int main()
 {
 	setlocale(LC_ALL, "Rus");
-	Read();
+	read();
 	MST_Kruskal();
 	return 0;
 }
