@@ -10,35 +10,41 @@ struct Point
 };
 Point p0;
 
-int orient(Point& p1, Point& p2, Point& p3) {
+int orient(Point& p1, Point& p2, Point& p3) //определение угла если 0- лежат на одной пямой, t>0 -левая(1), t<0-правая(2)
+{
 	int t = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
 	if (t == 0)
 		return 0;
 	return (t > 0) ? 1 : 2;
 }
 
-int distance(Point& p1, Point& p2) {
+int distance(Point& p1, Point& p2)//рассчет растояния между точками
+{
 	return (p2.x - p1.x) * (p2.y - p1.y);
 }
 
-bool cmp(Point& p1, Point& p2) {
+bool cmp(Point& p1, Point& p2)//если угол между точками=0, то возвращаем дистанцию
+{
 	if (orient(p0, p1, p2) == 0) {
 		return distance(p0, p1) < distance(p0, p2);
 	}
 	return (orient(p0, p1, p2) == 2);
 }
 
-Point NextToTop(stack<Point> S) {
+Point NextToTop(stack<Point> S)//следующая точка после top
+{
 	if (S.size() < 2)
 		exit(1);
 	S.pop();
 	return S.top();
 }
 
-void convexHull(Point* points,int n) {
+void convexHull(Point* points,int n)
+{
 	
 	int min  = 0;
 	int ymin = points[0].y;
+	//определяем начальную точку p0
 	for (int i = 0; i < n; i++)
 	{
 		if (points[i].y < points[0].y)
@@ -53,7 +59,7 @@ void convexHull(Point* points,int n) {
 	}
 	swap(points[0], points[min]);
 	p0 = points[0];
-	int j = 0;
+	//сортируем точки
 	sort(points+1,points + n, cmp);
 	
 	int m = 1;
@@ -64,15 +70,17 @@ void convexHull(Point* points,int n) {
 		points[m] = points[i];
 		m++;
 	}
+
 	if (m < 3)
 		return;
+
 	stack<Point> S;
 	S.push(points[0]);
 	S.push(points[1]);
 	S.push(points[2]);
 
 	for (int i = 3; i < n; i++) {
-		while (orient(NextToTop(S), S.top(), points[i]) != 2 ) {
+		while (orient(NextToTop(S), S.top(), points[i]) !=2 ) {
 			S.pop();
 		}
 		S.push(points[i]);
@@ -91,7 +99,7 @@ int main()
 	Point points[] = {
 	{ 0, 3 }, { 1, 1 }, { 2, 2 }, { 5, 5 },
 	{ 0, 0 }, { 1, 2 }, { 3, 1 }, { 3, 3 },
-	{ -5 , -5 },{ -5 , 5 }, { 5, -5 }, {0,9}, {-9,0}, {0,-9}, {9,0} };
+	{ -5 , -5 },{ -5 , 5 }, { 5, -5 }, {0,20}, {-20,0}, {0,-20}, {20,0} };
 	int n = sizeof(points)  / sizeof(points[0]);
 	convexHull(points, n);
 
