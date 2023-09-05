@@ -1,194 +1,99 @@
 #include <iostream>
-#include <fstream>
-#include <list>
-#include <time.h>
 #include <vector>
-
+#include <queue>
+#include <fstream>
 using namespace std;
-class Graph
-{
-public:
-	Graph(int n) // инициализация
-	{
-		num = n;
-		v = new vector<int>[n];
-		visited = new bool[n];
-		v1 = new vector<int>[n];
-		for (int i = 0; i < n; i++)
-		{
-			t.push_back(0);
-		}
-	}
-	~Graph()
-	{
-		delete[] v;
-		delete[] visited;
-		delete[] v1;
-	} 
-	void addEdge()  // чтение из файла 
-	{
-		int tmp;
-		ifstream in("input.txt");
-		if (in.is_open()) {
-			for (int i = 0; i < num; i++) {
-				for (int j = 0; j < num; j++) {
-					in >> tmp;
-					v[i].push_back(tmp);
-				}
-			}
-		}
-		else
-			cout << "Файл не найден" << endl;
-		in.close();
-	}
-	void printGraph() // запись в файл, вывод
-	{
-		for (int i = 0; i < num; i++) {
-			cout << i << ":";
-			copy(v[i].begin(), v[i].end(), ostream_iterator<int>(cout, " "));
-			cout << endl;
-		}
-		ofstream out("output.txt");
-		for (int i = 0; i < num; i++) {
-			out << i << ":";
-			copy(v[i].begin(), v[i].end(), ostream_iterator<int>(cout, " "));
-			out << endl;
-		}
-	}
-	// поиск dfs
-	void find(int u) 
-	{
-		visited[u] = true;
-		t[u] = ++time;
-		for (auto i = v[u].begin(); i != v[u].end(); i++) {
-			if (!visited[*i]) {
-				find(*i);
-			}
-		}
-		t[u] = time++;
-	}
-	void DFS()
-	{
-		for (int u = 0; u < num; u++)
-			visited[u] = false;
 
-		for (int u = 0; u < num; u++)
-		{
-			if (!visited[u])
-			{
-				find(u);
-			}
-		}
-	}
-	// Инвертирование ребер
-	void Invers()
-	{
-		int** mas = new int* [num];
-		for (int i = 0; i < num; i++)
-			mas[i] = new int[num];
+#define INF INT_MAX
 
-		int element;
-		ifstream in("input.txt");
-		for (int i = 0; i < num; i++)
-			for (int j = 0; j < num; j++)
-				in >> mas[j][i];
-		in.close();
+// Структура для представления вершины графа
+struct Node {
+    int cost; // Стоимость пути до вершины
+    int parent; // Родитель вершины
 
-		for (int i = 0; i < num; i++)
-			for (int j = 0; j < num; j++)
-				if (mas[i][j] == 1)
-					v1[i].push_back(j);
-
-		cout << " Inversion vers: \n";
-		for (int i = 0; i < num; i++)
-		{
-			cout << i << ": "; copy(v1[i].begin(), v1[i].end(), ostream_iterator<int>(cout, " "));
-			cout << endl;
-		}
-
-		for (int i = 0; i < num; i++)
-			delete[] mas[i];
-		delete[] mas;
-	}
-	int MAXX(vector<int> mas)
-	{
-		int maxs = -1;
-		for (int i = 0; i < mas.size(); i++)
-			if (mas[i] > maxs)
-				maxs = mas[i];
-		return maxs;
-	}
-	// поиск в глубину с учитыванием таймера ( по убыванию ) 
-	void Find_for_DFSwM(int u, vector<int>* Q_m)
-	{
-		visited[u] = true;
-		for (int i = 0; i < v1[u].size(); i++)
-			if (!visited[v1[u][i]])
-				Find_for_DFSwM(v1[u][i], Q_m);
-		Q_m->push_back(u);
-
-		t[u] = 0;
-	}
-	// поиск в глубину с учётом времени выхода по убыванию 
-	void DFS_with_max()
-	{
-		vector<vector<int>> Q;
-		for (int u = 0; u < num; u++)
-			visited[u] = false;
-
-		vector<int> time_queue;
-
-		for (int i = 0; i < num; i++)
-			for (int u = 0; u < num; u++)
-			{
-				if (!visited[u] && t.at(u) == MAXX(t))
-					Find_for_DFSwM(u, &time_queue);
-
-				Q.push_back(time_queue);
-				time_queue.clear();
-			}
-
-		ofstream out("output.txt");
-		out << "Сильно связанные компоненты: \n";
-		cout << "Сильно связанные компоненты: \n";
-		for (int i = 0; i < Q.size(); i++)
-		{
-			if (!Q[i].empty()) {
-				for (int j = 0; j < Q[i].size(); j++)
-				{
-					out << Q[i][j] << " ";
-					cout << Q[i][j] << " ";
-				}
-				out << endl;
-				cout << endl;
-			}
-		}
-	}
-	void Kosaradju()
-	{
-		DFS();
-		Invers();
-		DFS_with_max();
-	}
-	
-private:
-	vector<int> *v;
-	vector<int>* v1;
-	int num;
-	bool* visited;
-	int time = 0;
-	vector<int> t;
-	vector<vector<int>> Q;
+    Node() {
+        cost = INF;
+        parent = -1;
+    }
 };
 
+// Реализация алгоритма Прима для минимального остовного дерева
+void MST_Prim(vector<vector<int>>& graph, int startVertex) {
+    int n = graph.size(); // Количество вершин в графе
 
+    vector<bool> visited(n, false); // Посещены ли вершины
+    vector<Node> nodes(n); // Массив для хранения информации о каждой вершине
 
+    nodes[startVertex].cost = 0; // Начинаем с выбранной стартовой вершины
 
-int main()
-{
-	setlocale(LC_ALL, "Rus");
-	Graph g(8);
-	g.addEdge();
-	g.Kosaradju();
-	return 0;
+    // Создаем приоритетную очередь, в которой вершины отсортированы по их текущей стоимости
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+    pq.push({ 0, startVertex }); // Добавляем стартовую вершину в очередь
+
+    while (!pq.empty()) {
+        int u = pq.top().second; // Получаем вершину с наименьшей стоимостью
+        pq.pop();
+
+        visited[u] = true; // Посещаем вершину
+
+        // Проходим по всем соседним вершинам и обновляем их стоимости, если это необходимо
+        for (int v = 0; v < n; v++) {
+            if (graph[u][v] != 0 && !visited[v] && graph[u][v] < nodes[v].cost) {
+                nodes[v].cost = graph[u][v];
+                nodes[v].parent = u;
+                pq.push({ nodes[v].cost, v });
+            }
+        }
+    }
+
+    // Выводим минимальное остовное дерево
+    for (int i = 0; i < n; i++) {
+        if (i != startVertex) {
+            cout << "Ребро: " << i << " - " << nodes[i].parent << ", Стоимость: " << nodes[i].cost << endl;
+        }
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "Rus");
+    int num=0; // Количество вершин графа
+    ifstream in("input.txt");
+    int elem;
+    if (!in) {
+        cout << "Smth wrong with file";
+        exit(1);
+    }
+    else {
+        while (in >> elem) {
+            num++;
+        }
+    }
+    in.close();
+    num = sqrt(num);        
+
+    vector<vector<int>> graph(num, vector<int>(num));
+
+    cout << "Матрица смежности графа:\n";
+    in.open("input.txt");
+    for (int i = 0; i < num; i++) {
+        for (int j = 0; j < num; j++) {
+            in >> elem;
+            graph[i][j] = elem;
+        }
+    }
+    in.close();
+     for (int i = 0; i < num; i++) {
+        for (int j = 0; j < num; j++) {
+            cout << graph[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    int startVertex=0;
+    cout << "Введите стартовую вершину: ";
+    cin >> startVertex;
+
+    MST_Prim(graph, startVertex);
+
+    return 0;
 }
