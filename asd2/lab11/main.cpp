@@ -7,37 +7,44 @@
 using namespace std;
 
 
-int nextState(string tmp, int M, int state, int x)
+string nextState(string tmp)
 {
-	if (state < M && x == tmp[state])
-		return state + 1;
-
-	for (int ns = state; ns > 0; ns--)
+	string time = "";
+	for (int i = 0; i < tmp.length(); i++)
 	{
-		if (tmp[ns - 1] == x)
-		{
-			for (int i = 0; i < ns - 1; i++)
-			{
-				if (tmp[i] != tmp[state - ns + 1 + i])
-					break;
-
-				if (i == ns - 1)
-					return ns;
-			}
-		}
+		if (time.find(tmp[i]) == string::npos)
+			time += tmp[i];
 	}
-	return 0;
+
+	return time;
 }
 
 void computeTF(string tmp, int M, int** mas)
 {
-	for (int state = 0; state <= M; state++)
-		for (int x = 0; x < 256; x++)
-			mas[state][x] = nextState(tmp, M, state, x);
+	int len = 0;
+	for (int i = 0; i < M; i++)
+	{
+		mas[0][i] = 0;
+	}
+	mas[0][0] = 1;
+
+	for (int i = 1; i < tmp.length() + 1; i++)
+	{
+		for (int j = 0; j < M; j++)
+		{
+			mas[i][j] = mas[len][j];
+		}
+		mas[i][nextState(tmp).find(tmp[i])] = i + 1;
+		len = mas[len][nextState(tmp).find(tmp[i])];
+	}
+
+
 }
 
 void search(string str, string tmp)
 {
+	if (str.length() < tmp.length())
+		exit(1);
 	int M = str.size();
 	int N = tmp.size();
 	int** mas = new int* [M + 1];
@@ -45,14 +52,26 @@ void search(string str, string tmp)
 	{
 		mas[i] = new int[256];
 	}
-	computeTF(tmp, M, mas);
+	computeTF(str, M, mas);
 	int state = 0;
-	for (int i = 0; i < N; i++)
+	vector<int> result;
+	for (int i = 0; i < M; i++)
 	{
-		state = mas[state][tmp[i]];
-		if (state == M)
-			cout << "Найдено сходство " << i - M + 1 << endl;
+		if (nextState(tmp).find(str[i]) == string::npos)
+			state = mas[state][nextState(tmp).length()];
+		else
+			state = mas[state][nextState(tmp).find(str[i])];
+		if (state == tmp.length())
+			result.push_back(i - tmp.length() + 2);
 	}
+	if (!result.empty())
+	{
+		for (auto i : result)
+			cout << i << " ";
+	}
+	else
+		cout << "не найдено";
+
 
 	for (int i = 0; i < M; i++)
 		delete[] mas[i];
@@ -75,7 +94,7 @@ int main()
 	in >> str;
 	in.close();
 	cout << str << endl;
-	string tmp ="AAA";
+	string tmp ="AABA";
 	//cout << "Введите строку для поискa:"; cin >> tmp; cout << endl;
 	search(str, tmp);
 	return 0;
